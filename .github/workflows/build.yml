@@ -1,0 +1,25 @@
+# Builds a ready-to-use Windows VST3 on every push (no local Visual Studio needed).
+# The result appears under the workflow run as the "MIMIC-VST3-Windows" artifact.
+name: Build MIMIC
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S . -B build -A x64
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Upload VST3
+        uses: actions/upload-artifact@v4
+        with:
+          name: MIMIC-VST3-Windows
+          path: build/MIMIC_artefacts/Release/VST3/MIMIC.vst3

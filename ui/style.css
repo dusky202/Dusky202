@@ -1,0 +1,334 @@
+/* MIMIC - every artist wears its own colour. One loud element (the name), everything else quiet. */
+
+@property --accent {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #7c5cff;
+}
+
+:root {
+  --accent: #7c5cff;
+  --ink: #100c16;          /* violet-tinted ink, not neutral black */
+  --panel: #17121f;
+  --line: #2b2337;
+  --text: #f1ecf7;
+  --muted: #9186a1;
+  --faint: #5d536b;
+  --sung: #f1ecf7;
+
+  --display: "Bahnschrift Condensed", "Bahnschrift", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --ui: "Bahnschrift", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+
+  color-scheme: dark;
+  transition: --accent 420ms ease;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--ink);
+  color: var(--text);
+  font-family: var(--ui);
+  font-size: 14px;
+  line-height: 1.4;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+
+.app {
+  /* designed at a fixed 960x620 canvas; app.js zooms it to the editor size */
+  display: grid;
+  grid-template-columns: 216px 1fr;
+  width: 960px;
+  height: 620px;
+}
+
+/* ---------------------------------------------------------------- roster */
+.roster {
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.wordmark {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 30px;
+  letter-spacing: 0.02em;
+  padding: 18px 20px 14px;
+  color: var(--text);
+}
+
+.artist-list {
+  overflow-y: auto;
+  padding: 0 10px 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+
+.group-title {
+  color: var(--faint);
+  font-size: 12px;
+  padding: 14px 10px 6px;
+}
+
+.artist {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 14.5px;
+  text-align: left;
+  cursor: pointer;
+}
+.artist i {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--dot);
+  opacity: 0.45;
+  flex: none;
+}
+.artist:hover { color: var(--text); }
+.artist[aria-current="true"] {
+  background: color-mix(in srgb, var(--dot) 16%, transparent);
+  color: var(--text);
+}
+.artist[aria-current="true"] i { opacity: 1; box-shadow: 0 0 0 3px color-mix(in srgb, var(--dot) 30%, transparent); }
+
+/* ---------------------------------------------------------------- stage */
+.stage {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto auto;
+  padding: 16px 28px 20px;
+  min-width: 0;
+  min-height: 0;
+  isolation: isolate;
+}
+/* the colour field behind the name: the artist's accent bleeding in from the top-right */
+.stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--accent) 38%, transparent) 0%, transparent 55%),
+    radial-gradient(70% 60% at 0% 100%, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.tuning { display: flex; gap: 10px; }
+.pick {
+  display: flex; align-items: center; gap: 8px;
+  color: var(--muted); font-size: 13px;
+}
+.pick select {
+  appearance: none;
+  background: color-mix(in srgb, var(--ink) 70%, transparent);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 28px 6px 10px;
+  font: inherit;
+  cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 15px) 52%, calc(100% - 10px) 52%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
+.pick select:hover { border-color: var(--faint); }
+.pick option { background: var(--panel); }
+
+.meters { display: flex; gap: 14px; }
+.meter { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+.meter i {
+  position: relative;
+  width: 92px; height: 6px; border-radius: 3px;
+  background: var(--line);
+  overflow: hidden;
+}
+.meter b {
+  position: absolute; inset: 0 auto 0 0;
+  width: 0;
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+/* ---------------------------------------------------------------- hero: the loud element */
+.hero {
+  align-self: center;
+  min-width: 0;
+  padding: 8px 0 4px;
+}
+.artist-name {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(56px, 11vw, 132px);
+  line-height: 0.86;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+.artist-name.swap { animation: nameIn 460ms cubic-bezier(.2,.8,.2,1); }
+@keyframes nameIn {
+  from { clip-path: inset(0 100% 0 0); transform: translateX(-12px); color: var(--accent); }
+  60%  { color: var(--accent); }
+  to   { clip-path: inset(0 0 0 0); transform: none; }
+}
+.tagline {
+  margin: 12px 0 0;
+  max-width: 52ch;
+  font-size: 16px;
+  color: color-mix(in srgb, var(--text) 78%, var(--accent));
+}
+
+/* ---------------------------------------------------------------- pitch strip */
+.pitch {
+  display: grid;
+  grid-template-columns: 150px 1fr auto;
+  align-items: center;
+  gap: 24px;
+  padding: 14px 18px;
+  margin: 14px 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--panel) 82%, transparent);
+}
+.note { display: flex; flex-direction: column; }
+.note-name {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.note-sub { color: var(--muted); font-size: 12.5px; margin-top: 4px; }
+
+.cents-scale, .cents-legend {
+  display: flex; justify-content: space-between;
+  color: var(--faint); font-size: 11px;
+}
+.cents-legend { justify-content: flex-start; gap: 16px; margin-top: 6px; }
+.cents-legend span::before {
+  content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  margin-right: 6px; vertical-align: -0.5px;
+}
+.cents-legend .sung::before { background: var(--sung); opacity: .55; }
+.cents-legend .out::before  { background: var(--accent); }
+
+.cents-track {
+  position: relative;
+  height: 14px;
+  margin-top: 4px;
+  border-radius: 7px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--line) 100%, transparent) 50%, transparent);
+}
+.cents-zero { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--faint); }
+.cents-mark {
+  position: absolute; top: 50%;
+  width: 12px; height: 12px; margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  left: 50%;
+  transition: left 90ms linear, opacity 200ms;
+  opacity: 0;
+}
+.cents-mark.sung { background: var(--sung); opacity: 0; }
+.cents-mark.out  { background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+.pitch.live .cents-mark.sung { opacity: .55; }
+.pitch.live .cents-mark.out  { opacity: 1; }
+
+.dyn { display: flex; gap: 22px; }
+.dyn div { display: flex; flex-direction: column; align-items: flex-end; }
+.dyn span { color: var(--faint); font-size: 11.5px; }
+.dyn strong { font-weight: 600; font-variant-numeric: tabular-nums; font-size: 15px; }
+
+/* ---------------------------------------------------------------- knobs */
+.macros {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.knob {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 2px;
+  cursor: ns-resize;
+  touch-action: none;
+  outline: none;
+}
+.knob svg { display: block; overflow: visible; }
+.knob.big svg   { width: 96px; height: 96px; }
+.knob.small svg { width: 58px; height: 58px; }
+.knob .track { stroke: var(--line); }
+.knob .fill  { stroke: var(--accent); }
+.knob .home  { fill: var(--faint); }
+.knob .cap   { fill: color-mix(in srgb, var(--panel) 85%, var(--accent)); }
+.knob .needle { stroke: var(--text); }
+.knob-label { font-size: 14px; color: var(--text); margin-top: 2px; }
+.knob-value { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.knob.small .knob-label { font-size: 12.5px; }
+.knob:focus-visible svg { filter: drop-shadow(0 0 6px var(--accent)); }
+.knob.dragging .knob-value { color: var(--accent); }
+
+/* ---------------------------------------------------------------- footer */
+.footer {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 28px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.amount-head { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.amount-head span { color: var(--text); }
+.amount-head strong { font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.hslider {
+  position: relative;
+  height: 22px;
+  cursor: ew-resize;
+  touch-action: none;
+}
+.hslider::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 9px; height: 4px; border-radius: 2px;
+  background: var(--line);
+}
+.hslider-fill {
+  position: absolute; left: 0; top: 9px; height: 4px; border-radius: 2px;
+  background: var(--accent);
+}
+.hslider-thumb {
+  position: absolute; top: 3px; width: 16px; height: 16px; margin-left: -8px;
+  border-radius: 50%;
+  background: var(--text);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { transition: none; }
+  .artist-name.swap { animation: none; }
+  .cents-mark { transition: none; }
+}

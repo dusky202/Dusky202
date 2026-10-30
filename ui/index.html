@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MIMIC</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="roster" aria-label="Sanat&#231;&#305;lar">
+      <div class="wordmark" aria-label="MIMIC">MIMIC</div>
+      <nav id="artistList" class="artist-list"></nav>
+    </aside>
+
+    <main class="stage">
+      <header class="topbar">
+        <div class="tuning">
+          <label class="pick">
+            <span>Ton</span>
+            <select id="keySelect" aria-label="Ton"></select>
+          </label>
+          <label class="pick">
+            <span>Dizi</span>
+            <select id="scaleSelect" aria-label="Dizi"></select>
+          </label>
+        </div>
+        <div class="meters" aria-hidden="true">
+          <div class="meter"><span>Giri&#351;</span><i><b id="meterIn"></b></i></div>
+          <div class="meter"><span>&#199;&#305;k&#305;&#351;</span><i><b id="meterOut"></b></i></div>
+        </div>
+      </header>
+
+      <section class="hero" aria-live="polite">
+        <h1 id="artistName" class="artist-name" lang="en">Juice WRLD</h1>
+        <p id="artistTagline" class="tagline"></p>
+      </section>
+
+      <section class="pitch" aria-label="Pitch">
+        <div class="note">
+          <span id="noteName" class="note-name">&#8211;</span>
+          <span id="noteSub" class="note-sub">Ses bekleniyor</span>
+        </div>
+        <div class="cents" aria-hidden="true">
+          <div class="cents-scale"><span>&#8722;50</span><span>0</span><span>+50</span></div>
+          <div class="cents-track">
+            <i class="cents-zero"></i>
+            <b id="centsSung" class="cents-mark sung" title="S&#246;ylenen"></b>
+            <b id="centsOut" class="cents-mark out" title="&#199;&#305;kan"></b>
+          </div>
+          <div class="cents-legend"><span class="sung">S&#246;ylenen</span><span class="out">&#199;&#305;kan</span></div>
+        </div>
+        <div class="dyn" aria-hidden="true">
+          <div><span>Kompres</span><strong id="compGr">0.0 dB</strong></div>
+          <div><span>De-ess</span><strong id="deessGr">0.0 dB</strong></div>
+        </div>
+      </section>
+
+      <section class="macros" aria-label="Makrolar">
+        <div class="knob big" data-param="tune"  data-label="Tune"  data-hint="Kapal&#305; &#8596; sert tune"></div>
+        <div class="knob big" data-param="air"   data-label="Air"   data-hint="Tepe parlakl&#305;&#287;&#305;"></div>
+        <div class="knob big" data-param="grit"  data-label="Grit"  data-hint="Saturasyon / distortion"></div>
+        <div class="knob big" data-param="space" data-label="Space" data-hint="Delay + reverb"></div>
+        <div class="knob big" data-param="width" data-label="Width" data-hint="Doubler + stereo"></div>
+      </section>
+
+      <footer class="footer">
+        <div class="amount">
+          <div class="amount-head"><span>Amount</span><strong id="amountValue">100%</strong></div>
+          <div id="amountSlider" class="hslider" tabindex="0" role="slider" aria-label="Amount">
+            <i class="hslider-fill"></i><b class="hslider-thumb"></b>
+          </div>
+        </div>
+        <div class="knob small" data-param="formant" data-label="Formant" data-hint="Ses karakteri"></div>
+        <div class="knob small" data-param="output"  data-label="&#199;&#305;k&#305;&#351;"   data-hint="&#199;&#305;k&#305;&#351; seviyesi"></div>
+      </footer>
+    </main>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
