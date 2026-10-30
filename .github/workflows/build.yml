@@ -1,10 +1,15 @@
 # Builds a ready-to-use Windows VST3 on every push (no local Visual Studio needed).
-# The result appears under the workflow run as the "MIMIC-VST3-Windows" artifact.
+# The zipped plugin is published as the "MIMIC-VST3-Windows" artifact and committed
+# to the "mimic-bin" branch (MIMIC-Windows-VST3.zip) for a direct download link.
 name: Build MIMIC
 
 on:
   push:
+    branches: [mimic]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   windows:
@@ -18,8 +23,24 @@ jobs:
       - name: Build
         run: cmake --build build --config Release --parallel
 
+      - name: Zip VST3
+        shell: pwsh
+        run: Compress-Archive -Path build/MIMIC_artefacts/Release/VST3/MIMIC.vst3 -DestinationPath MIMIC-Windows-VST3.zip
+
       - name: Upload VST3
         uses: actions/upload-artifact@v4
         with:
           name: MIMIC-VST3-Windows
           path: build/MIMIC_artefacts/Release/VST3/MIMIC.vst3
+
+      - name: Publish to mimic-bin branch
+        shell: bash
+        run: |
+          mkdir out && cp MIMIC-Windows-VST3.zip out/
+          cd out
+          git init -q -b mimic-bin
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add MIMIC-Windows-VST3.zip
+          git commit -q -m "MIMIC build ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" mimic-bin
